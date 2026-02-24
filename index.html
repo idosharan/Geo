@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 שליטה בגיאומטריה - הרפתקת החלל</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue: #2196F3;
+  --blue-dark: #1565C0;
+  --green: #4CAF50;
+  --green-light: #81C784;
+  --yellow: #FFD600;
+  --yellow-light: #FFF176;
+  --orange: #FF9800;
+  --purple: #7C4DFF;
+  --pink: #FF4081;
+  --bg-dark: #0a1628;
+  --bg-card: rgba(255,255,255,0.12);
+  --text: #ffffff;
+  --radius: 18px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  direction: rtl;
+}
+
+/* ===== STARFIELD BACKGROUND ===== */
+.stars {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stars span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--dur) ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ===== LAYOUT ===== */
+.app-container {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  padding: 18px 10px 10px;
+}
+.header h1 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  margin-bottom: 4px;
+}
+.header .subtitle {
+  font-size: 1rem;
+  color: var(--yellow-light);
+  opacity: 0.85;
+}
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.stat-badge {
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 30px;
+  padding: 6px 18px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(6px);
+}
+.stat-badge .emoji { font-size: 1.2rem; }
+
+/* ===== PROGRESS BAR ===== */
+.progress-container {
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  height: 26px;
+  margin: 10px 0 16px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--green), var(--blue), var(--purple));
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ===== SCREENS ===== */
+.screen { display: none; flex-direction: column; align-items: center; flex: 1; }
+.screen.active { display: flex; }
+
+/* ===== WELCOME SCREEN ===== */
+.welcome-screen {
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+}
+.welcome-rocket {
+  font-size: 5rem;
+  animation: rocketBounce 2s ease-in-out infinite;
+}
+@keyframes rocketBounce {
+  0%,100% { transform: translateY(0) rotate(-10deg); }
+  50% { transform: translateY(-18px) rotate(10deg); }
+}
+.welcome-screen h2 {
+  font-size: 1.8rem;
+  color: var(--yellow);
+}
+.welcome-screen p {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.8);
+  max-width: 500px;
+}
+.level-select {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+.level-btn {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border: none;
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+.level-btn:hover, .level-btn:active {
+  transform: scale(1.04);
+  box-shadow: 0 12px 40px rgba(33,150,243,0.4);
+}
+.level-btn:nth-child(2) { background: linear-gradient(135deg, var(--green), #00897B); }
+.level-btn:nth-child(3) { background: linear-gradient(135deg, var(--orange), var(--pink)); }
+.level-btn .lock { opacity: 0.5; }
+
+/* ===== QUESTION CARD ===== */
+.question-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  width: 100%;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+  text-align: center;
+  animation: cardIn 0.5s ease-out;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.question-type-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 4px 16px;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  color: var(--yellow-light);
+}
+.question-text {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.question-text .highlight {
+  color: var(--yellow);
+  font-size: 1.5rem;
+}
+
+/* ===== SHAPE DISPLAY ===== */
+.shape-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px auto;
+  position: relative;
+}
+.shape-svg {
+  max-width: 260px;
+  max-height: 200px;
+}
+.shape-svg .shape-line {
+  stroke: var(--yellow);
+  stroke-width: 3;
+  fill: rgba(33,150,243,0.25);
+}
+.shape-svg .label-text {
+  fill: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+.shape-svg .dim-line {
+  stroke: var(--orange);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* ===== RULER ===== */
+.ruler-area {
+  position: relative;
+  margin: 16px auto;
+  width: 100%;
+  max-width: 500px;
+  height: 130px;
+  overflow: hidden;
+}
+.ruler-target {
+  position: absolute;
+  top: 10px;
+  height: 30px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--pink), var(--orange));
+  box-shadow: 0 4px 12px rgba(255,64,129,0.4);
+}
+.ruler-svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  cursor: grab;
+  touch-action: none;
+}
+.ruler-svg:active { cursor: grabbing; }
+.ruler-svg .ruler-bg {
+  fill: rgba(255,214,0,0.15);
+  stroke: var(--yellow);
+  stroke-width: 2;
+  rx: 8;
+}
+.ruler-svg .tick { stroke: var(--yellow); }
+.ruler-svg .tick-label {
+  fill: var(--yellow);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: sans-serif;
+  text-anchor: middle;
+}
+.ruler-instructions {
+  font-size: 0.85rem;
+  color: var(--yellow-light);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ===== ANSWERS ===== */
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+.answer-btn {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 16px 12px;
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.answer-btn:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: var(--blue);
+  transform: scale(1.03);
+}
+.answer-btn.correct {
+  background: rgba(76,175,80,0.35) !important;
+  border-color: var(--green) !important;
+  animation: correctPulse 0.5s;
+}
+.answer-btn.wrong {
+  background: rgba(255,152,0,0.3) !important;
+  border-color: var(--orange) !important;
+  animation: shake 0.5s;
+}
+@keyframes correctPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-8px); }
+  40%,80% { transform: translateX(8px); }
+}
+
+/* type-answer input */
+.type-answer-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  width: 100%;
+}
+.type-answer-area input {
+  width: 200px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 1.4rem;
+  text-align: center;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.type-answer-area input:focus {
+  border-color: var(--yellow);
+}
+.type-answer-area input::-webkit-inner-spin-button,
+.type-answer-area input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.type-answer-area input[type=number] {
+  -moz-appearance: textfield;
+}
+.type-answer-area input::placeholder {
+  color: rgba(255,255,255,0.35);
+  font-size: 1rem;
+}
+.submit-btn {
+  background: linear-gradient(135deg, var(--green), #00897B);
+  border: none;
+  border-radius: 14px;
+  padding: 14px 40px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(76,175,80,0.4);
+  transition: all 0.3s;
+}
+.submit-btn:hover { transform: scale(1.05); }
+
+/* ===== FEEDBACK OVERLAY ===== */
+.feedback-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+}
+.feedback-overlay.show { display: flex; }
+.feedback-box {
+  background: var(--bg-dark);
+  border-radius: 24px;
+  padding: 36px 32px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  animation: popIn 0.4s cubic-bezier(.2,1,.3,1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+.feedback-box .fb-emoji { font-size: 4rem; margin-bottom: 10px; }
+.feedback-box .fb-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+.feedback-box .fb-message { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 18px; }
+.feedback-box.correct-fb { border: 3px solid var(--green); }
+.feedback-box.correct-fb .fb-title { color: var(--green-light); }
+.feedback-box.wrong-fb { border: 3px solid var(--orange); }
+.feedback-box.wrong-fb .fb-title { color: var(--orange); }
+.fb-next-btn {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border: none;
+  border-radius: 14px;
+  padding: 14px 36px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.fb-next-btn:hover { transform: scale(1.05); }
+
+/* ===== RESULT SCREEN ===== */
+.result-screen {
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+}
+.result-screen .trophy { font-size: 5rem; animation: rocketBounce 2s ease-in-out infinite; }
+.result-screen h2 { font-size: 1.8rem; color: var(--yellow); }
+.result-stars { display: flex; gap: 10px; justify-content: center; }
+.result-stars .star {
+  font-size: 2.5rem;
+  transition: all 0.4s;
+}
+.result-stars .star.filled { animation: starPop 0.5s ease-out forwards; }
+@keyframes starPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.result-stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.result-stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  min-width: 120px;
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.result-stat-card .val {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--yellow);
+}
+.result-stat-card .lab {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+}
+.restart-btn {
+  background: linear-gradient(135deg, var(--green), #00897B);
+  border: none;
+  border-radius: var(--radius);
+  padding: 18px 40px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(76,175,80,0.4);
+  transition: all 0.3s;
+}
+.restart-btn:hover { transform: scale(1.05); }
+.home-btn {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius);
+  padding: 14px 32px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.home-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* ===== CONFETTI ===== */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -20px;
+  animation: confettiFall var(--fall) linear forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .header h1 { font-size: 1.5rem; }
+  .question-text { font-size: 1.15rem; }
+  .answers-grid { grid-template-columns: 1fr; }
+  .answer-btn { padding: 14px 10px; font-size: 1.05rem; }
+  .question-card { padding: 20px 14px; }
+  .level-btn { padding: 15px 18px; font-size: 1.05rem; }
+  .stats-bar { gap: 10px; }
+  .stat-badge { padding: 5px 12px; font-size: 0.85rem; }
+  .result-stats { gap: 12px; }
+}
+
+/* ===== ANIMATIONS ===== */
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(.2,1,.3,1);
+}
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Hint button */
+.hint-btn {
+  background: rgba(255,214,0,0.15);
+  border: 2px solid var(--yellow);
+  border-radius: 12px;
+  padding: 8px 20px;
+  color: var(--yellow);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s;
+}
+.hint-btn:hover { background: rgba(255,214,0,0.25); }
+.hint-text {
+  color: var(--yellow-light);
+  font-size: 0.9rem;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.hint-text.visible { opacity: 1; }
+
+/* Level indicator */
+.level-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: var(--yellow-light);
+}
+
+/* Home button in question screen */
+.home-back-btn {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 10px 20px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 10px;
+}
+.home-back-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: var(--yellow);
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<!-- Stars Background -->
+<div class="stars" id="stars"></div>
+
+<!-- Confetti Container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- Feedback Overlay -->
+<div class="feedback-overlay" id="feedbackOverlay">
+  <div class="feedback-box" id="feedbackBox">
+    <div class="fb-emoji" id="fbEmoji"></div>
+    <div class="fb-title" id="fbTitle"></div>
+    <div class="fb-message" id="fbMessage"></div>
+    <button class="fb-next-btn" id="fbNextBtn">הבא ←</button>
+  </div>
+</div>
+
+<div class="app-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🚀 שליטה בגיאומטריה</h1>
+    <div class="subtitle">הרפתקת החלל של נועם</div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar" id="statsBar" style="display:none;">
+    <div class="stat-badge"><span class="emoji">⭐</span> ניקוד: <strong id="scoreDisplay">0</strong></div>
+    <div class="stat-badge"><span class="emoji">🔥</span> רצף: <strong id="streakDisplay">0</strong></div>
+    <div class="stat-badge"><span class="emoji">🏆</span> שלב: <strong id="levelDisplay">1</strong></div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container" id="progressContainer" style="display:none;">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="progress-text" id="progressText">0 / 10</div>
+  </div>
+
+  <!-- ===== WELCOME SCREEN ===== -->
+  <div class="screen active" id="welcomeScreen">
+    <div class="welcome-screen">
+      <div class="welcome-rocket">🚀</div>
+      <h2>!ברוכים הבאים להרפתקה</h2>
+      <p>בואו נלמד גיאומטריה בכיף! בחרו שלב כדי להתחיל את המסע בחלל 🌟</p>
+      <div class="level-select">
+        <button class="level-btn" onclick="startLevel(1)">
+          <span>🌍</span> שלב 1 – המרת יחידות בסיסית
+        </button>
+        <button class="level-btn" onclick="startLevel(2)">
+          <span>🪐</span> שלב 2 – צורות והיקפים
+        </button>
+        <button class="level-btn" onclick="startLevel(3)">
+          <span>⭐</span> שלב 3 – אתגר אלופים
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUESTION SCREEN ===== -->
+  <div class="screen" id="questionScreen">
+    <button class="home-back-btn" onclick="goHome()">🏠 חזרה לתפריט</button>
+    <div class="question-card" id="questionCard">
+      <div class="level-indicator" id="levelIndicator"></div>
+      <div class="question-type-badge" id="questionTypeBadge"></div>
+      <div class="question-text" id="questionText"></div>
+      <!-- Shape display area -->
+      <div class="shape-display" id="shapeDisplay" style="display:none;"></div>
+      <!-- Ruler area -->
+      <div class="ruler-area" id="rulerArea" style="display:none;">
+        <div class="ruler-target" id="rulerTarget"></div>
+        <svg class="ruler-svg" id="rulerSvg"></svg>
+      </div>
+      <div class="ruler-instructions" id="rulerInstructions" style="display:none;">
+        גררו את הסרגל כדי למדוד 📏
+      </div>
+      <!-- Answers -->
+      <div class="answers-grid" id="answersGrid" style="display:none;"></div>
+      <div class="type-answer-area" id="typeAnswerArea" style="display:none;">
+        <input type="number" id="typeInput" placeholder="הקלידו תשובה..." autocomplete="off">
+        <button class="submit-btn" id="submitTypeBtn" onclick="checkTypeAnswer()">שליחה 🚀</button>
+      </div>
+      <!-- Hint -->
+      <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 רמז</button>
+      <div class="hint-text" id="hintText"></div>
+    </div>
+  </div>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <div class="screen" id="resultScreen">
+    <div class="result-screen">
+      <div class="trophy" id="resultEmoji">🏆</div>
+      <h2 id="resultTitle">כל הכבוד!</h2>
+      <div class="result-stars" id="resultStars"></div>
+      <div class="result-stats">
+        <div class="result-stat-card">
+          <div class="val" id="resultScore">0</div>
+          <div class="lab">ניקוד</div>
+        </div>
+        <div class="result-stat-card">
+          <div class="val" id="resultCorrect">0</div>
+          <div class="lab">תשובות נכונות</div>
+        </div>
+        <div class="result-stat-card">
+          <div class="val" id="resultStreak">0</div>
+          <div class="lab">רצף הכי ארוך</div>
+        </div>
+      </div>
+      <button class="restart-btn" onclick="restartLevel()">🔄 שחקו שוב</button>
+      <button class="home-btn" onclick="goHome()">🏠 חזרה לתפריט</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  DATA — Question Bank (JSON, easy to update)
+// ============================================================
+const QUESTION_BANK = {
+  // ----- LEVEL 1: Basic Unit Conversion -----
+  level1: [
+    // cm → mm
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3 ס\"מ</span> במילימטרים?", answer: 30, options: [30, 3, 300, 13], hint: "בכל סנטימטר יש 10 מילימטרים", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5 ס\"מ</span> במילימטרים?", answer: 50, options: [50, 5, 500, 55], hint: "הכפילו ב-10", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>7 ס\"מ</span> במילימטרים?", answer: 70, hint: "7 × 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>10 ס\"מ</span> במילימטרים?", answer: 100, options: [100, 10, 1000, 110], hint: "10 × 10 = ?", shape: null },
+    // mm → cm
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>40 מ\"מ</span> בסנטימטרים?", answer: 4, options: [4, 40, 400, 14], hint: "חלקו ב-10", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>90 מ\"מ</span> בסנטימטרים?", answer: 9, hint: "90 ÷ 10 = ?", shape: null },
+    // m → cm
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>2 מטר</span> בסנטימטרים?", answer: 200, options: [200, 20, 2000, 120], hint: "בכל מטר יש 100 סנטימטרים", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4 מטר</span> בסנטימטרים?", answer: 400, hint: "4 × 100 = ?", shape: null },
+    // cm → m
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>300 ס\"מ</span> במטרים?", answer: 3, options: [3, 30, 0.3, 300], hint: "חלקו ב-100", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>500 ס\"מ</span> במטרים?", answer: 5, hint: "500 ÷ 100 = ?", shape: null },
+  ],
+
+  // ----- LEVEL 2: Shapes & Perimeters -----
+  level2: [
+    { type: "mc", category: "ריבוע", q: "אם אורך צלע בריבוע הוא <span class='highlight'>4 ס\"מ</span>, מה היקף הריבוע?", answer: 16, options: [16, 8, 12, 20], hint: "היקף ריבוע = צלע × 4", shape: { type: "square", side: 4, unit: 'ס"מ' } },
+    { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>6 ס\"מ</span>. מה ההיקף?", answer: 24, hint: "6 × 4 = ?", shape: { type: "square", side: 6, unit: 'ס"מ' } },
+    { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>5 ס\"מ</span> ורוחב <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 16, options: [16, 15, 8, 30], hint: "היקף מלבן = (אורך + רוחב) × 2", shape: { type: "rectangle", width: 5, height: 3, unit: 'ס"מ' } },
+    { type: "type", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>8 ס\"מ</span> ורוחב <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 24, hint: "(8 + 4) × 2 = ?", shape: { type: "rectangle", width: 8, height: 4, unit: 'ס"מ' } },
+    { type: "mc", category: "משולש", q: "משולש שווה צלעות עם צלע <span class='highlight'>5 ס\"מ</span>. מה ההיקף?", answer: 15, options: [15, 10, 20, 25], hint: "היקף משולש שווה צלעות = צלע × 3", shape: { type: "triangle", sides: [5,5,5], unit: 'ס"מ' } },
+    { type: "type", category: "משולש", q: "משולש עם צלעות <span class='highlight'>3</span>, <span class='highlight'>4</span> ו-<span class='highlight'>5</span> ס\"מ. מה ההיקף?", answer: 12, hint: "3 + 4 + 5 = ?", shape: { type: "triangle", sides: [3,4,5], unit: 'ס"מ' } },
+    { type: "mc", category: "זיהוי צורות", q: "לצורה יש 4 צלעות שוות ו-4 זוויות ישרות. מה שם הצורה?", answer: "ריבוע", options: ["ריבוע", "מלבן", "משולש", "עיגול"], hint: "כל הצלעות שוות + 4 זוויות ישרות", shape: { type: "square", side: 4, unit: 'ס"מ' }, textAnswer: true },
+    { type: "mc", category: "זיהוי צורות", q: "לצורה יש 3 צלעות ו-3 זוויות. מה שם הצורה?", answer: "משולש", options: ["ריבוע", "מלבן", "משולש", "מעוין"], hint: "3 צלעות = ?", shape: { type: "triangle", sides: [4,4,4], unit: 'ס"מ' }, textAnswer: true },
+    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>10 ס\"מ</span>. מה ההיקף?", answer: 40, options: [40, 100, 20, 30], hint: "10 × 4", shape: { type: "square", side: 10, unit: 'ס"מ' } },
+    { type: "ruler", category: "מדידה בסרגל", q: "מדדו את האורך של הפס הצבעוני בעזרת הסרגל!", answer: 0, hint: "גררו את הסרגל ובדקו כמה סנטימטרים", shape: null, rulerLen: 0 },
+  ],
+
+  // ----- LEVEL 3: Champion's Challenge -----
+  level3: [
+    { type: "type", category: "המרת יחידות", q: "הפכו <span class='highlight'>2 ק\"מ</span> למטרים.", answer: 2000, hint: "בכל קילומטר יש 1000 מטרים", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5000 מטר</span> בקילומטרים?", answer: 5, options: [5, 50, 500, 0.5], hint: "חלקו ב-1000", shape: null },
+    { type: "type", category: "המרת יחידות", q: "הפכו <span class='highlight'>150 ס\"מ</span> למטרים ולסנטימטרים.<br>כמה מטרים שלמים?", answer: 1, hint: "150 ÷ 100 = 1 ושארית 50", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה מילימטרים ב-<span class='highlight'>1 מטר</span>?", answer: 1000, options: [1000, 100, 10, 10000], hint: "1 מטר = 100 ס\"מ, 1 ס\"מ = 10 מ\"מ", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3500 מטר</span> בקילומטרים שלמים?", answer: 3, hint: "3500 ÷ 1000 = ?", shape: null },
+    { type: "mc", category: "היקפים", q: "מלבן: אורך <span class='highlight'>12 ס\"מ</span>, רוחב <span class='highlight'>8 ס\"מ</span>. מה ההיקף?", answer: 40, options: [40, 20, 96, 32], hint: "(12 + 8) × 2 = ?", shape: { type: "rectangle", width: 12, height: 8, unit: 'ס"מ' } },
+    { type: "type", category: "היקפים", q: "ריבוע עם צלע <span class='highlight'>15 ס\"מ</span>. מה ההיקף?", answer: 60, hint: "15 × 4 = ?", shape: { type: "square", side: 15, unit: 'ס"מ' } },
+    { type: "mc", category: "היקפים", q: "משולש שווה צלעות עם צלע <span class='highlight'>9 ס\"מ</span>. מה ההיקף?", answer: 27, options: [27, 18, 36, 12], hint: "9 × 3 = ?", shape: { type: "triangle", sides: [9,9,9], unit: 'ס"מ' } },
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>20 ס\"מ</span>. מה אורך הצלע?", answer: 5, options: [5, 4, 10, 20], hint: "היקף ÷ 4 = צלע", shape: { type: "square", side: 5, unit: 'ס"מ' } },
+    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>30 ס\"מ</span> והאורך הוא <span class='highlight'>10 ס\"מ</span>. מה הרוחב?", answer: 5, hint: "30 ÷ 2 = 15, אז 15 - 10 = ?", shape: { type: "rectangle", width: 10, height: 5, unit: 'ס"מ' } },
+  ]
+};
+
+// ============================================================
+//  GAME STATE
+// ============================================================
+let state = {
+  currentLevel: 1,
+  currentQuestionIndex: 0,
+  questions: [],
+  score: 0,
+  streak: 0,
+  maxStreak: 0,
+  correctCount: 0,
+  answered: false,
+  hintUsed: false,
+  rulerOffset: 0,
+  rulerDragging: false,
+  rulerStartX: 0,
+  rulerMeasurement: 0,
+};
+
+// ============================================================
+//  SOUND PLACEHOLDERS (Web Audio API beeps)
+// ============================================================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+}
+
+function playSound(type) {
+  try {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.value = 0.15;
+
+    if (type === 'correct') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'wrong') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+    } else if (type === 'win') {
+      const notes = [523, 659, 784, 1047];
+      notes.forEach((f, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type = 'sine';
+        o.frequency.value = f;
+        g.gain.value = 0.12;
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3 * (i + 1) + 0.3);
+        o.start(audioCtx.currentTime + 0.2 * i);
+        o.stop(audioCtx.currentTime + 0.2 * i + 0.4);
+      });
+    }
+  } catch(e) { /* audio not supported, silently ignore */ }
+}
+
+// ============================================================
+//  STAR FIELD
+// ============================================================
+function createStars() {
+  const container = document.getElementById('stars');
+  const count = Math.min(120, Math.floor(window.innerWidth * window.innerHeight / 6000));
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    const size = Math.random() * 3 + 1;
+    s.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      left: ${Math.random() * 100}%; top: ${Math.random() * 100}%;
+      --dur: ${Math.random() * 3 + 2}s;
+      animation-delay: ${Math.random() * 3}s;
+    `;
+    container.appendChild(s);
+  }
+}
+
+// ============================================================
+//  CONFETTI
+// ============================================================
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#FFD600','#FF4081','#2196F3','#4CAF50','#7C4DFF','#FF9800'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const size = Math.random() * 8 + 6;
+    piece.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      --fall: ${Math.random() * 2 + 2}s;
+      animation-delay: ${Math.random() * 0.8}s;
+    `;
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.innerHTML = '', 4000);
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('progressContainer').style.display = 'none';
+  showScreen('welcomeScreen');
+}
+
+// ============================================================
+//  LEVEL START
+// ============================================================
+function startLevel(level) {
+  playSound('click');
+  state.currentLevel = level;
+  state.currentQuestionIndex = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.maxStreak = 0;
+  state.correctCount = 0;
+
+  // Copy and shuffle questions
+  const key = 'level' + level;
+  let questions = JSON.parse(JSON.stringify(QUESTION_BANK[key]));
+
+  // For ruler questions, generate random lengths
+  questions.forEach(q => {
+    if (q.type === 'ruler') {
+      const len = Math.floor(Math.random() * 6) + 3; // 3-8 cm
+      q.answer = len;
+      q.rulerLen = len;
+    }
+  });
+
+  // Shuffle
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+
+  state.questions = questions;
+
+  document.getElementById('statsBar').style.display = 'flex';
+  document.getElementById('progressContainer').style.display = '';
+  updateStats();
+  showScreen('questionScreen');
+  loadQuestion();
+}
+
+// ============================================================
+//  LOAD QUESTION
+// ============================================================
+function loadQuestion() {
+  const q = state.questions[state.currentQuestionIndex];
+  state.answered = false;
+  state.hintUsed = false;
+
+  // Update progress
+  const total = state.questions.length;
+  const current = state.currentQuestionIndex + 1;
+  document.getElementById('progressFill').style.width = ((current - 1) / total * 100) + '%';
+  document.getElementById('progressText').textContent = `${current} / ${total}`;
+
+  // Level indicator
+  const levelNames = ['🌍 שלב 1', '🪐 שלב 2', '⭐ שלב 3'];
+  document.getElementById('levelIndicator').textContent = levelNames[state.currentLevel - 1];
+
+  // Category badge
+  document.getElementById('questionTypeBadge').textContent = q.category;
+
+  // Question text
+  document.getElementById('questionText').innerHTML = q.q;
+
+  // Reset areas
+  document.getElementById('shapeDisplay').style.display = 'none';
+  document.getElementById('shapeDisplay').innerHTML = '';
+  document.getElementById('rulerArea').style.display = 'none';
+  document.getElementById('rulerInstructions').style.display = 'none';
+  document.getElementById('answersGrid').style.display = 'none';
+  document.getElementById('answersGrid').innerHTML = '';
+  document.getElementById('typeAnswerArea').style.display = 'none';
+  document.getElementById('typeInput').value = '';
+  document.getElementById('hintText').textContent = '';
+  document.getElementById('hintText').classList.remove('visible');
+  document.getElementById('hintBtn').style.display = '';
+
+  // Draw shape if applicable
+  if (q.shape) {
+    drawShape(q.shape);
+  }
+
+  // Render answer interface
+  if (q.type === 'mc') {
+    renderMultipleChoice(q);
+  } else if (q.type === 'type') {
+    document.getElementById('typeAnswerArea').style.display = 'flex';
+    setTimeout(() => document.getElementById('typeInput').focus(), 300);
+  } else if (q.type === 'ruler') {
+    setupRuler(q);
+  }
+
+  // Animate card
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  card.offsetHeight; // trigger reflow
+  card.style.animation = 'cardIn 0.5s ease-out';
+}
+
+// ============================================================
+//  DRAW SHAPES (SVG)
+// ============================================================
+function drawShape(shape) {
+  const display = document.getElementById('shapeDisplay');
+  display.style.display = 'flex';
+
+  let svg = '';
+  const w = 240, h = 180;
+
+  if (shape.type === 'square') {
+    const s = 100;
+    const x = (w - s) / 2, y = (h - s) / 2;
+    svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+      <rect class="shape-line" x="${x}" y="${y}" width="${s}" height="${s}" rx="4"/>
+      <!-- Top label -->
+      <line class="dim-line" x1="${x}" y1="${y - 12}" x2="${x + s}" y2="${y - 12}"/>
+      <text class="label-text" x="${x + s/2}" y="${y - 18}" text-anchor="middle">${shape.side} ${shape.unit}</text>
+      <!-- Right label -->
+      <line class="dim-line" x1="${x + s + 12}" y1="${y}" x2="${x + s + 12}" y2="${y + s}"/>
+      <text class="label-text" x="${x + s + 28}" y="${y + s/2 + 5}" text-anchor="middle">${shape.side} ${shape.unit}</text>
+    </svg>`;
+  } else if (shape.type === 'rectangle') {
+    const rw = 140, rh = 80;
+    const x = (w - rw) / 2, y = (h - rh) / 2;
+    svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+      <rect class="shape-line" x="${x}" y="${y}" width="${rw}" height="${rh}" rx="4"/>
+      <line class="dim-line" x1="${x}" y1="${y - 12}" x2="${x + rw}" y2="${y - 12}"/>
+      <text class="label-text" x="${x + rw/2}" y="${y - 18}" text-anchor="middle">${shape.width} ${shape.unit}</text>
+      <line class="dim-line" x1="${x + rw + 12}" y1="${y}" x2="${x + rw + 12}" y2="${y + rh}"/>
+      <text class="label-text" x="${x + rw + 30}" y="${y + rh/2 + 5}" text-anchor="middle">${shape.height} ${shape.unit}</text>
+    </svg>`;
+  } else if (shape.type === 'triangle') {
+    const cx = w / 2, topY = 25, botY = h - 25;
+    const halfBase = 70;
+    const pts = `${cx},${topY} ${cx - halfBase},${botY} ${cx + halfBase},${botY}`;
+    const s = shape.sides;
+    svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+      <polygon class="shape-line" points="${pts}"/>
+      <!-- Bottom label -->
+      <text class="label-text" x="${cx}" y="${botY + 18}" text-anchor="middle">${s[0]} ${shape.unit}</text>
+      <!-- Left label -->
+      <text class="label-text" x="${cx - halfBase - 16}" y="${(topY + botY)/2}" text-anchor="end">${s[1]} ${shape.unit}</text>
+      <!-- Right label -->
+      <text class="label-text" x="${cx + halfBase + 16}" y="${(topY + botY)/2}" text-anchor="start">${s[2]} ${shape.unit}</text>
+    </svg>`;
+  }
+
+  display.innerHTML = svg;
+}
+
+// ============================================================
+//  RULER SETUP & INTERACTION
+// ============================================================
+function setupRuler(q) {
+  const rulerArea = document.getElementById('rulerArea');
+  const rulerTarget = document.getElementById('rulerTarget');
+  const rulerSvg = document.getElementById('rulerSvg');
+  const instructions = document.getElementById('rulerInstructions');
+
+  rulerArea.style.display = 'block';
+  instructions.style.display = 'block';
+
+  // Set target bar width based on answer
+  const pxPerCm = 40; // pixels per cm on ruler
+  const targetLen = q.answer * pxPerCm;
+  rulerTarget.style.width = targetLen + 'px';
+  rulerTarget.style.right = '20px';
+
+  // Build ruler SVG: 15 cm long
+  const rulerWidthCm = 15;
+  const rulerWidthPx = rulerWidthCm * pxPerCm;
+  const rulerH = 70;
+
+  state.rulerOffset = 0;
+  state.rulerMeasurement = 0;
+
+  function renderRuler(offset) {
+    let svgContent = `<rect class="ruler-bg" x="0" y="0" width="${rulerWidthPx}" height="${rulerH}"/>`;
+    for (let i = 0; i <= rulerWidthCm; i++) {
+      const x = i * pxPerCm;
+      // cm ticks
+      svgContent += `<line class="tick" x1="${x}" y1="0" x2="${x}" y2="28" stroke-width="2"/>`;
+      svgContent += `<text class="tick-label" x="${x}" y="44">${i}</text>`;
+      // mm ticks
+      if (i < rulerWidthCm) {
+        for (let mm = 1; mm < 10; mm++) {
+          const mx = x + mm * (pxPerCm / 10);
+          const tickH = mm === 5 ? 18 : 10;
+          svgContent += `<line class="tick" x1="${mx}" y1="0" x2="${mx}" y2="${tickH}" stroke-width="1"/>`;
+        }
+      }
+    }
+
+    rulerSvg.setAttribute('viewBox', `0 0 ${rulerWidthPx} ${rulerH}`);
+    rulerSvg.setAttribute('width', rulerWidthPx);
+    rulerSvg.setAttribute('height', rulerH);
+    rulerSvg.style.transform = `translateX(${offset}px)`;
+    rulerSvg.innerHTML = svgContent;
+  }
+
+  renderRuler(0);
+
+  // Drag logic
+  function onStart(e) {
+    if (state.answered) return;
+    state.rulerDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    state.rulerStartX = clientX - state.rulerOffset;
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!state.rulerDragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    state.rulerOffset = clientX - state.rulerStartX;
+    rulerSvg.style.transform = `translateX(${state.rulerOffset}px)`;
+    e.preventDefault();
+  }
+  function onEnd() {
+    state.rulerDragging = false;
+  }
+
+  // Remove old listeners by cloning
+  const newSvg = rulerSvg.cloneNode(true);
+  rulerSvg.parentNode.replaceChild(newSvg, rulerSvg);
+
+  // We need the newSvg now  
+  newSvg.innerHTML = '';
+  renderRulerOnNewSvg(newSvg, pxPerCm, rulerWidthCm, rulerH);
+
+  newSvg.addEventListener('mousedown', onStart);
+  newSvg.addEventListener('touchstart', onStart, { passive: false });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('mouseup', onEnd);
+  window.addEventListener('touchend', onEnd);
+
+  // Show type answer for ruler
+  document.getElementById('typeAnswerArea').style.display = 'flex';
+  document.getElementById('typeInput').placeholder = '?ס"מ כמה';
+  
+  function renderRulerOnNewSvg(svg, pxPerCm, rulerWidthCm, rulerH) {
+    const rulerWidthPx = rulerWidthCm * pxPerCm;
+    let svgContent = `<rect class="ruler-bg" x="0" y="0" width="${rulerWidthPx}" height="${rulerH}"/>`;
+    for (let i = 0; i <= rulerWidthCm; i++) {
+      const x = i * pxPerCm;
+      svgContent += `<line class="tick" x1="${x}" y1="0" x2="${x}" y2="28" stroke-width="2"/>`;
+      svgContent += `<text class="tick-label" x="${x}" y="44">${i}</text>`;
+      if (i < rulerWidthCm) {
+        for (let mm = 1; mm < 10; mm++) {
+          const mx = x + mm * (pxPerCm / 10);
+          const tickH = mm === 5 ? 18 : 10;
+          svgContent += `<line class="tick" x1="${mx}" y1="0" x2="${mx}" y2="${tickH}" stroke-width="1"/>`;
+        }
+      }
+    }
+    svg.setAttribute('viewBox', `0 0 ${rulerWidthPx} ${rulerH}`);
+    svg.setAttribute('width', rulerWidthPx);
+    svg.setAttribute('height', rulerH);
+    svg.innerHTML = svgContent;
+  }
+}
+
+// ============================================================
+//  MULTIPLE CHOICE
+// ============================================================
+function renderMultipleChoice(q) {
+  const grid = document.getElementById('answersGrid');
+  grid.style.display = 'grid';
+
+  // Shuffle options
+  let opts = [...q.options];
+  for (let i = opts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+  }
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = typeof opt === 'string' ? opt : opt;
+    btn.addEventListener('click', () => checkMCAnswer(btn, opt, q));
+    grid.appendChild(btn);
+  });
+}
+
+// ============================================================
+//  ANSWER CHECKING
+// ============================================================
+function checkMCAnswer(btn, selected, q) {
+  if (state.answered) return;
+  state.answered = true;
+  playSound('click');
+
+  const isCorrect = (selected === q.answer) || (q.textAnswer && selected === q.answer);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    handleCorrect();
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct
+    document.querySelectorAll('.answer-btn').forEach(b => {
+      if (b.textContent == q.answer) b.classList.add('correct');
+    });
+    handleWrong(q);
+  }
+}
+
+function checkTypeAnswer() {
+  if (state.answered) return;
+  const input = document.getElementById('typeInput');
+  const val = parseFloat(input.value);
+  const q = state.questions[state.currentQuestionIndex];
+
+  if (isNaN(val)) {
+    input.style.borderColor = 'var(--orange)';
+    input.focus();
+    return;
+  }
+
+  state.answered = true;
+  playSound('click');
+
+  if (val === q.answer) {
+    input.style.borderColor = 'var(--green)';
+    handleCorrect();
+  } else {
+    input.style.borderColor = 'var(--orange)';
+    handleWrong(q);
+  }
+}
+
+function handleCorrect() {
+  playSound('correct');
+  const bonus = state.hintUsed ? 5 : 10;
+  state.score += bonus + state.streak * 2;
+  state.streak++;
+  if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+  state.correctCount++;
+  updateStats();
+  launchConfetti();
+
+  showFeedback(true, state.streak >= 3 ? `רצף של ${state.streak}! 🔥` : '');
+}
+
+function handleWrong(q) {
+  playSound('wrong');
+  state.streak = 0;
+  updateStats();
+
+  const correctAnswer = q.answer;
+  showFeedback(false, `התשובה הנכונה: ${correctAnswer}`);
+}
+
+// ============================================================
+//  FEEDBACK OVERLAY
+// ============================================================
+function showFeedback(isCorrect, extraMsg) {
+  const overlay = document.getElementById('feedbackOverlay');
+  const box = document.getElementById('feedbackBox');
+  const emoji = document.getElementById('fbEmoji');
+  const title = document.getElementById('fbTitle');
+  const message = document.getElementById('fbMessage');
+
+  box.className = 'feedback-box ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+
+  if (isCorrect) {
+    const emojis = ['🌟', '🚀', '🎉', '⭐', '💫', '🏆'];
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const titles = ['!מצוין', '!נכון', '!כל הכבוד', '!מדהים', '!סחתיין'];
+    title.textContent = titles[Math.floor(Math.random() * titles.length)];
+  } else {
+    emoji.textContent = '🤔';
+    title.textContent = '!נסו שוב';
+  }
+
+  message.textContent = extraMsg || '';
+  overlay.classList.add('show');
+}
+
+document.getElementById('fbNextBtn').addEventListener('click', () => {
+  playSound('click');
+  document.getElementById('feedbackOverlay').classList.remove('show');
+  nextQuestion();
+});
+
+// ============================================================
+//  NEXT QUESTION / END LEVEL
+// ============================================================
+function nextQuestion() {
+  state.currentQuestionIndex++;
+  if (state.currentQuestionIndex >= state.questions.length) {
+    endLevel();
+  } else {
+    loadQuestion();
+  }
+}
+
+function endLevel() {
+  playSound('win');
+  launchConfetti();
+
+  const total = state.questions.length;
+  const pct = state.correctCount / total;
+
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressText').textContent = `${total} / ${total}`;
+
+  // Result screen
+  document.getElementById('resultScore').textContent = state.score;
+  document.getElementById('resultCorrect').textContent = `${state.correctCount}/${total}`;
+  document.getElementById('resultStreak').textContent = state.maxStreak;
+
+  // Stars
+  const starsContainer = document.getElementById('resultStars');
+  starsContainer.innerHTML = '';
+  const starCount = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : pct >= 0.3 ? 1 : 0;
+  for (let i = 0; i < 3; i++) {
+    const span = document.createElement('span');
+    span.className = 'star';
+    span.textContent = i < starCount ? '⭐' : '☆';
+    if (i < starCount) {
+      span.classList.add('filled');
+      span.style.animationDelay = (i * 0.3) + 's';
+    }
+    starsContainer.appendChild(span);
+  }
+
+  // Title & emoji
+  if (pct >= 0.9) {
+    document.getElementById('resultTitle').textContent = '!מושלם! אתם אלופים';
+    document.getElementById('resultEmoji').textContent = '🏆';
+  } else if (pct >= 0.6) {
+    document.getElementById('resultTitle').textContent = '!עבודה טובה מאוד';
+    document.getElementById('resultEmoji').textContent = '🌟';
+  } else {
+    document.getElementById('resultTitle').textContent = '!כל הכבוד על הניסיון';
+    document.getElementById('resultEmoji').textContent = '💪';
+  }
+
+  showScreen('resultScreen');
+}
+
+function restartLevel() {
+  playSound('click');
+  startLevel(state.currentLevel);
+}
+
+// ============================================================
+//  HINT
+// ============================================================
+function showHint() {
+  const q = state.questions[state.currentQuestionIndex];
+  const hintText = document.getElementById('hintText');
+  hintText.textContent = '💡 ' + q.hint;
+  hintText.classList.add('visible');
+  state.hintUsed = true;
+  document.getElementById('hintBtn').style.display = 'none';
+}
+
+// ============================================================
+//  STATS UPDATE
+// ============================================================
+function updateStats() {
+  document.getElementById('scoreDisplay').textContent = state.score;
+  document.getElementById('streakDisplay').textContent = state.streak;
+  document.getElementById('levelDisplay').textContent = state.currentLevel;
+}
+
+// ============================================================
+//  KEYBOARD SUPPORT
+// ============================================================
+document.getElementById('typeInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') checkTypeAnswer();
+});
+
+// ============================================================
+//  INIT
+// ============================================================
+createStars();
+</script>
+</body>
+</html>
