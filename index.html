@@ -747,43 +747,103 @@ const QUESTION_BANK = {
     { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5 ס\"מ</span> במילימטרים?", answer: 50, options: [50, 5, 500, 55], hint: "הכפילו ב-10", shape: null },
     { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>7 ס\"מ</span> במילימטרים?", answer: 70, hint: "7 × 10 = ?", shape: null },
     { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>10 ס\"מ</span> במילימטרים?", answer: 100, options: [100, 10, 1000, 110], hint: "10 × 10 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>1 ס\"מ</span> במילימטרים?", answer: 10, hint: "בכל סנטימטר יש 10 מ\"מ", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>8 ס\"מ</span> במילימטרים?", answer: 80, options: [80, 8, 800, 18], hint: "8 × 10 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>2 ס\"מ</span> במילימטרים?", answer: 20, hint: "2 × 10 = ?", shape: null },
     // mm → cm
     { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>40 מ\"מ</span> בסנטימטרים?", answer: 4, options: [4, 40, 400, 14], hint: "חלקו ב-10", shape: null },
     { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>90 מ\"מ</span> בסנטימטרים?", answer: 9, hint: "90 ÷ 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>60 מ\"מ</span> בסנטימטרים?", answer: 6, options: [6, 60, 16, 600], hint: "60 ÷ 10 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>20 מ\"מ</span> בסנטימטרים?", answer: 2, hint: "20 ÷ 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>100 מ\"מ</span> בסנטימטרים?", answer: 10, options: [10, 100, 1, 1000], hint: "100 ÷ 10 = ?", shape: null },
     // m → cm
     { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>2 מטר</span> בסנטימטרים?", answer: 200, options: [200, 20, 2000, 120], hint: "בכל מטר יש 100 סנטימטרים", shape: null },
     { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4 מטר</span> בסנטימטרים?", answer: 400, hint: "4 × 100 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>1 מטר</span> בסנטימטרים?", answer: 100, options: [100, 10, 1000, 50], hint: "1 מטר = 100 ס\"מ", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3 מטר</span> בסנטימטרים?", answer: 300, hint: "3 × 100 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5 מטר</span> בסנטימטרים?", answer: 500, options: [500, 50, 5000, 55], hint: "5 × 100 = ?", shape: null },
     // cm → m
-    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>300 ס\"מ</span> במטרים?", answer: 3, options: [3, 30, 0.3, 300], hint: "חלקו ב-100", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>300 ס\"מ</span> במטרים?", answer: 3, options: [3, 30, 300, 0.3], hint: "חלקו ב-100", shape: null },
     { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>500 ס\"מ</span> במטרים?", answer: 5, hint: "500 ÷ 100 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>200 ס\"מ</span> במטרים?", answer: 2, options: [2, 20, 200, 0.2], hint: "200 ÷ 100 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>700 ס\"מ</span> במטרים?", answer: 7, hint: "700 ÷ 100 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>1000 ס\"מ</span> במטרים?", answer: 10, options: [10, 100, 1, 1000], hint: "1000 ÷ 100 = ?", shape: null },
+    // בעיות מילוליות - חיי יומיום
+    { type: "mc", category: "בעיית מילים", q: "עפרון באורך <span class='highlight'>15 ס\"מ</span>. כמה זה במילימטרים?", answer: 150, options: [150, 15, 1500, 1.5], hint: "15 × 10 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "שולחן באורך <span class='highlight'>1 מטר</span>. כמה ס\"מ ארוך השולחן?", answer: 100, options: [100, 10, 1000, 50], hint: "1 מטר = ? ס\"מ", shape: null },
+    { type: "type", category: "בעיית מילים", q: "מחק באורך <span class='highlight'>30 מ\"מ</span>. כמה זה בסנטימטרים?", answer: 3, hint: "30 ÷ 10 = ?", shape: null },
   ],
 
   // ----- LEVEL 2: Shapes & Perimeters -----
   level2: [
+    // ריבועים
     { type: "mc", category: "ריבוע", q: "אם אורך צלע בריבוע הוא <span class='highlight'>4 ס\"מ</span>, מה היקף הריבוע?", answer: 16, options: [16, 8, 12, 20], hint: "היקף ריבוע = צלע × 4", shape: { type: "square", side: 4, unit: 'ס"מ' } },
     { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>6 ס\"מ</span>. מה ההיקף?", answer: 24, hint: "6 × 4 = ?", shape: { type: "square", side: 6, unit: 'ס"מ' } },
+    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>10 ס\"מ</span>. מה ההיקף?", answer: 40, options: [40, 100, 20, 30], hint: "10 × 4", shape: { type: "square", side: 10, unit: 'ס"מ' } },
+    { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 12, hint: "3 × 4 = ?", shape: { type: "square", side: 3, unit: 'ס"מ' } },
+    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>7 ס\"מ</span>. מה ההיקף?", answer: 28, options: [28, 14, 21, 35], hint: "7 × 4 = ?", shape: { type: "square", side: 7, unit: 'ס"מ' } },
+    { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>9 ס\"מ</span>. מה ההיקף?", answer: 36, hint: "9 × 4 = ?", shape: { type: "square", side: 9, unit: 'ס"מ' } },
+    // מלבנים
     { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>5 ס\"מ</span> ורוחב <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 16, options: [16, 15, 8, 30], hint: "היקף מלבן = (אורך + רוחב) × 2", shape: { type: "rectangle", width: 5, height: 3, unit: 'ס"מ' } },
     { type: "type", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>8 ס\"מ</span> ורוחב <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 24, hint: "(8 + 4) × 2 = ?", shape: { type: "rectangle", width: 8, height: 4, unit: 'ס"מ' } },
+    { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>6 ס\"מ</span> ורוחב <span class='highlight'>2 ס\"מ</span>. מה ההיקף?", answer: 16, options: [16, 12, 8, 24], hint: "(6 + 2) × 2 = ?", shape: { type: "rectangle", width: 6, height: 2, unit: 'ס"מ' } },
+    { type: "type", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>10 ס\"מ</span> ורוחב <span class='highlight'>5 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "(10 + 5) × 2 = ?", shape: { type: "rectangle", width: 10, height: 5, unit: 'ס"מ' } },
+    { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>7 ס\"מ</span> ורוחב <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 20, options: [20, 21, 10, 14], hint: "(7 + 3) × 2 = ?", shape: { type: "rectangle", width: 7, height: 3, unit: 'ס"מ' } },
+    // משולשים
     { type: "mc", category: "משולש", q: "משולש שווה צלעות עם צלע <span class='highlight'>5 ס\"מ</span>. מה ההיקף?", answer: 15, options: [15, 10, 20, 25], hint: "היקף משולש שווה צלעות = צלע × 3", shape: { type: "triangle", sides: [5,5,5], unit: 'ס"מ' } },
     { type: "type", category: "משולש", q: "משולש עם צלעות <span class='highlight'>3</span>, <span class='highlight'>4</span> ו-<span class='highlight'>5</span> ס\"מ. מה ההיקף?", answer: 12, hint: "3 + 4 + 5 = ?", shape: { type: "triangle", sides: [3,4,5], unit: 'ס"מ' } },
+    { type: "mc", category: "משולש", q: "משולש שווה צלעות עם צלע <span class='highlight'>8 ס\"מ</span>. מה ההיקף?", answer: 24, options: [24, 16, 32, 12], hint: "8 × 3 = ?", shape: { type: "triangle", sides: [8,8,8], unit: 'ס"מ' } },
+    { type: "type", category: "משולש", q: "משולש עם צלעות <span class='highlight'>6</span>, <span class='highlight'>7</span> ו-<span class='highlight'>8</span> ס\"מ. מה ההיקף?", answer: 21, hint: "6 + 7 + 8 = ?", shape: { type: "triangle", sides: [6,7,8], unit: 'ס"מ' } },
+    { type: "mc", category: "משולש", q: "משולש שווה שוקיים: שוק <span class='highlight'>5 ס\"מ</span> ובסיס <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 14, options: [14, 15, 20, 9], hint: "5 + 5 + 4 = ?", shape: { type: "triangle", sides: [4,5,5], unit: 'ס"מ' } },
+    // זיהוי צורות
     { type: "mc", category: "זיהוי צורות", q: "לצורה יש 4 צלעות שוות ו-4 זוויות ישרות. מה שם הצורה?", answer: "ריבוע", options: ["ריבוע", "מלבן", "משולש", "עיגול"], hint: "כל הצלעות שוות + 4 זוויות ישרות", shape: { type: "square", side: 4, unit: 'ס"מ' }, textAnswer: true },
     { type: "mc", category: "זיהוי צורות", q: "לצורה יש 3 צלעות ו-3 זוויות. מה שם הצורה?", answer: "משולש", options: ["ריבוע", "מלבן", "משולש", "מעוין"], hint: "3 צלעות = ?", shape: { type: "triangle", sides: [4,4,4], unit: 'ס"מ' }, textAnswer: true },
-    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>10 ס\"מ</span>. מה ההיקף?", answer: 40, options: [40, 100, 20, 30], hint: "10 × 4", shape: { type: "square", side: 10, unit: 'ס"מ' } },
+    { type: "mc", category: "זיהוי צורות", q: "לצורה יש 4 זוויות ישרות אבל הצלעות לא כולן שוות. מה שם הצורה?", answer: "מלבן", options: ["ריבוע", "מלבן", "משולש", "מעוין"], hint: "4 זוויות ישרות + צלעות לא שוות", shape: { type: "rectangle", width: 6, height: 3, unit: 'ס"מ' }, textAnswer: true },
+    { type: "mc", category: "זיהוי צורות", q: "כמה צלעות יש לריבוע?", answer: 4, options: [4, 3, 5, 6], hint: "ריבוע הוא מרובע", shape: { type: "square", side: 4, unit: 'ס"מ' } },
+    { type: "mc", category: "זיהוי צורות", q: "כמה קודקודים (פינות) יש למלבן?", answer: 4, options: [4, 3, 2, 6], hint: "מלבן הוא מרובע עם 4 פינות", shape: { type: "rectangle", width: 5, height: 3, unit: 'ס"מ' } },
+    // בעיות מילוליות מחיי יומיום
+    { type: "mc", category: "בעיית מילים", q: "דן רוצה לגדר גינה בצורת ריבוע עם צלע <span class='highlight'>5 מטר</span>. כמה מטרים של גדר הוא צריך?", answer: 20, options: [20, 25, 10, 15], hint: "היקף ריבוע = צלע × 4", shape: { type: "square", side: 5, unit: 'מטר' } },
+    { type: "type", category: "בעיית מילים", q: "נועם רוצה לשים סרט דבק סביב תמונה בצורת מלבן.<br>אורך: <span class='highlight'>6 ס\"מ</span>, רוחב: <span class='highlight'>4 ס\"מ</span>.<br>כמה ס\"מ של סרט הוא צריך?", answer: 20, hint: "(6 + 4) × 2 = ?", shape: { type: "rectangle", width: 6, height: 4, unit: 'ס"מ' } },
+    // סרגל
     { type: "ruler", category: "מדידה בסרגל", q: "מדדו את האורך של הפס הצבעוני בעזרת הסרגל!", answer: 0, hint: "גררו את הסרגל ובדקו כמה סנטימטרים", shape: null, rulerLen: 0 },
   ],
 
   // ----- LEVEL 3: Champion's Challenge -----
   level3: [
+    // המרת km ↔ m
     { type: "type", category: "המרת יחידות", q: "הפכו <span class='highlight'>2 ק\"מ</span> למטרים.", answer: 2000, hint: "בכל קילומטר יש 1000 מטרים", shape: null },
     { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5000 מטר</span> בקילומטרים?", answer: 5, options: [5, 50, 500, 0.5], hint: "חלקו ב-1000", shape: null },
+    { type: "type", category: "המרת יחידות", q: "הפכו <span class='highlight'>3 ק\"מ</span> למטרים.", answer: 3000, hint: "3 × 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4000 מטר</span> בקילומטרים?", answer: 4, options: [4, 40, 400, 0.4], hint: "4000 ÷ 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>7 ק\"מ</span> במטרים?", answer: 7000, hint: "7 × 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>10000 מטר</span> בקילומטרים?", answer: 10, options: [10, 100, 1, 1000], hint: "10000 ÷ 1000 = ?", shape: null },
+    // המרות מעורבות
     { type: "type", category: "המרת יחידות", q: "הפכו <span class='highlight'>150 ס\"מ</span> למטרים ולסנטימטרים.<br>כמה מטרים שלמים?", answer: 1, hint: "150 ÷ 100 = 1 ושארית 50", shape: null },
     { type: "mc", category: "המרת יחידות", q: "כמה מילימטרים ב-<span class='highlight'>1 מטר</span>?", answer: 1000, options: [1000, 100, 10, 10000], hint: "1 מטר = 100 ס\"מ, 1 ס\"מ = 10 מ\"מ", shape: null },
     { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3500 מטר</span> בקילומטרים שלמים?", answer: 3, hint: "3500 ÷ 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>250 ס\"מ</span> במטרים שלמים?", answer: 2, options: [2, 25, 3, 250], hint: "250 ÷ 100 = 2 ושארית 50", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה מילימטרים ב-<span class='highlight'>50 ס\"מ</span>?", answer: 500, hint: "50 × 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה ס\"מ יש ב-<span class='highlight'>2 מטר ו-30 ס\"מ</span>?", answer: 230, options: [230, 203, 2030, 23], hint: "2 × 100 + 30 = ?", shape: null },
+    // היקפים מתקדמים
     { type: "mc", category: "היקפים", q: "מלבן: אורך <span class='highlight'>12 ס\"מ</span>, רוחב <span class='highlight'>8 ס\"מ</span>. מה ההיקף?", answer: 40, options: [40, 20, 96, 32], hint: "(12 + 8) × 2 = ?", shape: { type: "rectangle", width: 12, height: 8, unit: 'ס"מ' } },
     { type: "type", category: "היקפים", q: "ריבוע עם צלע <span class='highlight'>15 ס\"מ</span>. מה ההיקף?", answer: 60, hint: "15 × 4 = ?", shape: { type: "square", side: 15, unit: 'ס"מ' } },
     { type: "mc", category: "היקפים", q: "משולש שווה צלעות עם צלע <span class='highlight'>9 ס\"מ</span>. מה ההיקף?", answer: 27, options: [27, 18, 36, 12], hint: "9 × 3 = ?", shape: { type: "triangle", sides: [9,9,9], unit: 'ס"מ' } },
+    { type: "type", category: "היקפים", q: "מלבן עם אורך <span class='highlight'>11 ס\"מ</span> ורוחב <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "(11 + 4) × 2 = ?", shape: { type: "rectangle", width: 11, height: 4, unit: 'ס"מ' } },
+    { type: "mc", category: "היקפים", q: "ריבוע עם צלע <span class='highlight'>12 ס\"מ</span>. מה ההיקף?", answer: 48, options: [48, 24, 36, 144], hint: "12 × 4 = ?", shape: { type: "square", side: 12, unit: 'ס"מ' } },
+    { type: "type", category: "היקפים", q: "משולש עם צלעות <span class='highlight'>7</span>, <span class='highlight'>10</span> ו-<span class='highlight'>8</span> ס\"מ. מה ההיקף?", answer: 25, hint: "7 + 10 + 8 = ?", shape: { type: "triangle", sides: [10,7,8], unit: 'ס"מ' } },
+    // אתגרים הפוכים – מציאת צלע מתוך היקף
     { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>20 ס\"מ</span>. מה אורך הצלע?", answer: 5, options: [5, 4, 10, 20], hint: "היקף ÷ 4 = צלע", shape: { type: "square", side: 5, unit: 'ס"מ' } },
     { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>30 ס\"מ</span> והאורך הוא <span class='highlight'>10 ס\"מ</span>. מה הרוחב?", answer: 5, hint: "30 ÷ 2 = 15, אז 15 - 10 = ?", shape: { type: "rectangle", width: 10, height: 5, unit: 'ס"מ' } },
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>36 ס\"מ</span>. מה אורך הצלע?", answer: 9, options: [9, 6, 12, 8], hint: "36 ÷ 4 = ?", shape: { type: "square", side: 9, unit: 'ס"מ' } },
+    { type: "type", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>18 ס\"מ</span>. מה אורך כל צלע?", answer: 6, hint: "18 ÷ 3 = ?", shape: { type: "triangle", sides: [6,6,6], unit: 'ס"מ' } },
+    { type: "mc", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>24 ס\"מ</span> והרוחב הוא <span class='highlight'>4 ס\"מ</span>. מה האורך?", answer: 8, options: [8, 6, 10, 12], hint: "24 ÷ 2 = 12, אז 12 - 4 = ?", shape: { type: "rectangle", width: 8, height: 4, unit: 'ס"מ' } },
+    // בעיות מילוליות מאתגרות
+    { type: "type", category: "בעיית מילים", q: "לנועם יש חבל באורך <span class='highlight'>2 מטר</span>. הוא רוצה לעשות ממנו ריבוע.<br>מה יהיה אורך כל צלע בסנטימטרים?", answer: 50, hint: "2 מטר = 200 ס\"מ, אז 200 ÷ 4 = ?", shape: { type: "square", side: 50, unit: 'ס"מ' } },
+    { type: "mc", category: "בעיית מילים", q: "מגרש כדורגל קטן בצורת מלבן: אורך <span class='highlight'>20 מטר</span>, רוחב <span class='highlight'>10 מטר</span>.<br>מה היקף המגרש?", answer: 60, options: [60, 200, 30, 40], hint: "(20 + 10) × 2 = ?", shape: { type: "rectangle", width: 20, height: 10, unit: 'מטר' } },
+    { type: "type", category: "בעיית מילים", q: "יעל רצה <span class='highlight'>3</span> פעמים סביב מגרש ריבועי עם צלע <span class='highlight'>10 מטר</span>.<br>כמה מטרים היא רצה בסך הכל?", answer: 120, hint: "היקף = 10 × 4 = 40, אז 40 × 3 = ?", shape: { type: "square", side: 10, unit: 'מטר' } },
+    { type: "mc", category: "בעיית מילים", q: "המרחק מהבית לבית הספר הוא <span class='highlight'>1 ק\"מ ו-500 מטר</span>. כמה מטרים זה?", answer: 1500, options: [1500, 1050, 500, 15000], hint: "1 ק\"מ = 1000 מטר, אז 1000 + 500 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "סרגל באורך <span class='highlight'>30 ס\"מ</span>. כמה מילימטרים זה?", answer: 300, hint: "30 × 10 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "שרשרת באורך <span class='highlight'>2 מטר</span>. חתכו ממנה <span class='highlight'>50 ס\"מ</span>.<br>כמה ס\"מ נשאר?", answer: 150, options: [150, 250, 50, 100], hint: "2 מטר = 200 ס\"מ, אז 200 - 50 = ?", shape: null },
   ]
 };
 
