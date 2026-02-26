@@ -379,7 +379,8 @@ body {
   background: rgba(255,255,255,0.1);
   color: white;
   font-size: 1.4rem;
-  text-align: center;
+  text-align: right;
+  direction: rtl;
   font-weight: 700;
   outline: none;
   transition: border-color 0.3s;
@@ -620,6 +621,63 @@ body {
   border-color: var(--yellow);
   transform: scale(1.05);
 }
+
+/* ===== SUB-LEVEL SELECT SCREEN ===== */
+.sublevel-screen {
+  justify-content: flex-start;
+  text-align: center;
+  gap: 18px;
+  padding-top: 10px;
+}
+.sublevel-screen h2 {
+  font-size: 1.6rem;
+  color: var(--yellow);
+  margin-top: 6px;
+}
+.sublevel-screen .sublevel-desc {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+  max-width: 500px;
+}
+.sublevel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 460px;
+}
+.sublevel-btn {
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 18px 14px;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(6px);
+}
+.sublevel-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--yellow);
+  background: rgba(255,255,255,0.18);
+}
+.sublevel-btn .sub-emoji { font-size: 1.8rem; }
+.sublevel-btn .sub-name { font-size: 1rem; }
+.sublevel-btn .sub-info { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.sublevel-btn.active-sub {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(76,175,80,0.3);
+}
+@media (max-width: 600px) {
+  .sublevel-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -644,14 +702,14 @@ body {
   <!-- Header -->
   <div class="header">
     <h1>🚀 שליטה בגיאומטריה</h1>
-    <div class="subtitle">הרפתקת החלל של נועם</div>
+    <div class="subtitle">הרפתקת החלל של שרן גיימס</div>
   </div>
 
   <!-- Stats Bar -->
   <div class="stats-bar" id="statsBar" style="display:none;">
     <div class="stat-badge"><span class="emoji">⭐</span> ניקוד: <strong id="scoreDisplay">0</strong></div>
     <div class="stat-badge"><span class="emoji">🔥</span> רצף: <strong id="streakDisplay">0</strong></div>
-    <div class="stat-badge"><span class="emoji">🏆</span> שלב: <strong id="levelDisplay">1</strong></div>
+    <div class="stat-badge"><span class="emoji">🏆</span> נושא: <strong id="levelDisplay">1</strong></div>
   </div>
 
   <!-- Progress Bar -->
@@ -667,16 +725,27 @@ body {
       <h2>!ברוכים הבאים להרפתקה</h2>
       <p>בואו נלמד גיאומטריה בכיף! בחרו שלב כדי להתחיל את המסע בחלל 🌟</p>
       <div class="level-select">
-        <button class="level-btn" onclick="startLevel(1)">
+        <button class="level-btn" onclick="showSubLevels(1)">
           <span>🌍</span> שלב 1 – המרת יחידות בסיסית
         </button>
-        <button class="level-btn" onclick="startLevel(2)">
+        <button class="level-btn" onclick="showSubLevels(2)">
           <span>🪐</span> שלב 2 – צורות והיקפים
         </button>
-        <button class="level-btn" onclick="startLevel(3)">
+        <button class="level-btn" onclick="showSubLevels(3)">
           <span>⭐</span> שלב 3 – אתגר אלופים
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== SUB-LEVEL SELECT SCREEN ===== -->
+  <div class="screen" id="subLevelScreen">
+    <div class="sublevel-screen">
+      <button class="home-back-btn" onclick="goHome()">🏠 חזרה לתפריט</button>
+      <div id="subLevelIcon" style="font-size:3.5rem;">🌍</div>
+      <h2 id="subLevelTitle">שלב 1</h2>
+      <div class="sublevel-desc" id="subLevelDesc">בחרו תת-שלב להתחיל (15 שאלות בכל תת-שלב)</div>
+      <div class="sublevel-grid" id="subLevelGrid"></div>
     </div>
   </div>
 
@@ -730,6 +799,7 @@ body {
         </div>
       </div>
       <button class="restart-btn" onclick="restartLevel()">🔄 שחקו שוב</button>
+      <button class="home-btn" id="backToSubLevelsBtn" onclick="backToSubLevels()" style="margin-bottom:10px;">📋 תתי-שלבים</button>
       <button class="home-btn" onclick="goHome()">🏠 חזרה לתפריט</button>
     </div>
   </div>
@@ -772,6 +842,38 @@ const QUESTION_BANK = {
     { type: "mc", category: "בעיית מילים", q: "עפרון באורך <span class='highlight'>15 ס\"מ</span>. כמה זה במילימטרים?", answer: 150, options: [150, 15, 1500, 1.5], hint: "15 × 10 = ?", shape: null },
     { type: "mc", category: "בעיית מילים", q: "שולחן באורך <span class='highlight'>1 מטר</span>. כמה ס\"מ ארוך השולחן?", answer: 100, options: [100, 10, 1000, 50], hint: "1 מטר = ? ס\"מ", shape: null },
     { type: "type", category: "בעיית מילים", q: "מחק באורך <span class='highlight'>30 מ\"מ</span>. כמה זה בסנטימטרים?", answer: 3, hint: "30 ÷ 10 = ?", shape: null },
+    // שאלות נוספות - המרת יחידות
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4 ס\"מ</span> במילימטרים?", answer: 40, options: [40, 4, 400, 14], hint: "4 × 10 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>6 ס\"מ</span> במילימטרים?", answer: 60, hint: "6 × 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>50 מ\"מ</span> בסנטימטרים?", answer: 5, options: [5, 50, 15, 500], hint: "50 ÷ 10 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>70 מ\"מ</span> בסנטימטרים?", answer: 7, hint: "70 ÷ 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>9 ס\"מ</span> במילימטרים?", answer: 90, options: [90, 9, 900, 19], hint: "9 × 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>400 ס\"מ</span> במטרים?", answer: 4, options: [4, 40, 400, 0.4], hint: "400 ÷ 100 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>600 ס\"מ</span> במטרים?", answer: 6, hint: "600 ÷ 100 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>800 ס\"מ</span> במטרים?", answer: 8, options: [8, 80, 800, 0.8], hint: "800 ÷ 100 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>30 מ\"מ</span> בסנטימטרים?", answer: 3, hint: "30 ÷ 10 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>80 מ\"מ</span> בסנטימטרים?", answer: 8, options: [8, 80, 18, 800], hint: "80 ÷ 10 = ?", shape: null },
+    // שאלות נוספות - בעיות מילוליות
+    { type: "mc", category: "בעיית מילים", q: "חוט באורך <span class='highlight'>20 ס\"מ</span>. כמה זה במילימטרים?", answer: 200, options: [200, 20, 2000, 2], hint: "20 × 10 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "דלת בגובה <span class='highlight'>2 מטר</span>. כמה זה בסנטימטרים?", answer: 200, hint: "2 × 100 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "בריכה ברוחב <span class='highlight'>3 מטר</span>. כמה זה בסנטימטרים?", answer: 300, options: [300, 30, 3000, 3], hint: "3 × 100 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "עט באורך <span class='highlight'>14 ס\"מ</span>. כמה זה במילימטרים?", answer: 140, hint: "14 × 10 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "ספר ברוחב <span class='highlight'>2 ס\"מ</span>. כמה זה במילימטרים?", answer: 20, options: [20, 200, 2, 12], hint: "2 × 10 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "חדר באורך <span class='highlight'>4 מטר</span>. כמה זה בסנטימטרים?", answer: 400, hint: "4 × 100 = ?", shape: null },
+    // מטר ↔ קילומטר
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>1 ק\"מ</span> במטרים?", answer: 1000, options: [1000, 100, 10000, 500], hint: "בכל קילומטר יש 1000 מטרים", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>2 ק\"מ</span> במטרים?", answer: 2000, hint: "2 × 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3 ק\"מ</span> במטרים?", answer: 3000, options: [3000, 300, 30, 30000], hint: "3 × 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5 ק\"מ</span> במטרים?", answer: 5000, hint: "5 × 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4 ק\"מ</span> במטרים?", answer: 4000, options: [4000, 400, 40, 40000], hint: "4 × 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>10 ק\"מ</span> במטרים?", answer: 10000, hint: "10 × 1000 = ?", shape: null },
+    // מטר → ק"מ
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>2000 מטר</span> בקילומטרים?", answer: 2, options: [2, 20, 200, 0.2], hint: "2000 ÷ 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>5000 מטר</span> בקילומטרים?", answer: 5, hint: "5000 ÷ 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>3000 מטר</span> בקילומטרים?", answer: 3, options: [3, 30, 300, 0.3], hint: "3000 ÷ 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>7000 מטר</span> בקילומטרים?", answer: 7, hint: "7000 ÷ 1000 = ?", shape: null },
+    { type: "mc", category: "המרת יחידות", q: "כמה זה <span class='highlight'>10000 מטר</span> בקילומטרים?", answer: 10, options: [10, 100, 1, 1000], hint: "10000 ÷ 1000 = ?", shape: null },
+    { type: "type", category: "המרת יחידות", q: "כמה זה <span class='highlight'>4000 מטר</span> בקילומטרים?", answer: 4, hint: "4000 ÷ 1000 = ?", shape: null },
   ],
 
   // ----- LEVEL 2: Shapes & Perimeters -----
@@ -803,9 +905,40 @@ const QUESTION_BANK = {
     { type: "mc", category: "זיהוי צורות", q: "כמה קודקודים (פינות) יש למלבן?", answer: 4, options: [4, 3, 2, 6], hint: "מלבן הוא מרובע עם 4 פינות", shape: { type: "rectangle", width: 5, height: 3, unit: 'ס"מ' } },
     // בעיות מילוליות מחיי יומיום
     { type: "mc", category: "בעיית מילים", q: "דן רוצה לגדר גינה בצורת ריבוע עם צלע <span class='highlight'>5 מטר</span>. כמה מטרים של גדר הוא צריך?", answer: 20, options: [20, 25, 10, 15], hint: "היקף ריבוע = צלע × 4", shape: { type: "square", side: 5, unit: 'מטר' } },
-    { type: "type", category: "בעיית מילים", q: "נועם רוצה לשים סרט דבק סביב תמונה בצורת מלבן.<br>אורך: <span class='highlight'>6 ס\"מ</span>, רוחב: <span class='highlight'>4 ס\"מ</span>.<br>כמה ס\"מ של סרט הוא צריך?", answer: 20, hint: "(6 + 4) × 2 = ?", shape: { type: "rectangle", width: 6, height: 4, unit: 'ס"מ' } },
+    { type: "type", category: "בעיית מילים", q: "שרן רוצה לשים סרט דבק סביב תמונה בצורת מלבן.<br>אורך: <span class='highlight'>6 ס\"מ</span>, רוחב: <span class='highlight'>4 ס\"מ</span>.<br>כמה ס\"מ של סרט הוא צריך?", answer: 20, hint: "(6 + 4) × 2 = ?", shape: { type: "rectangle", width: 6, height: 4, unit: 'ס"מ' } },
     // סרגל
     { type: "ruler", category: "מדידה בסרגל", q: "מדדו את האורך של הפס הצבעוני בעזרת הסרגל!", answer: 0, hint: "גררו את הסרגל ובדקו כמה סנטימטרים", shape: null, rulerLen: 0 },
+    // שאלות נוספות - ריבוע
+    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>8 ס\"מ</span>. מה ההיקף?", answer: 32, options: [32, 24, 16, 64], hint: "8 × 4 = ?", shape: { type: "square", side: 8, unit: 'ס"מ' } },
+    { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>5 ס\"מ</span>. מה ההיקף?", answer: 20, hint: "5 × 4 = ?", shape: { type: "square", side: 5, unit: 'ס"מ' } },
+    { type: "mc", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>2 ס\"מ</span>. מה ההיקף?", answer: 8, options: [8, 4, 6, 12], hint: "2 × 4 = ?", shape: { type: "square", side: 2, unit: 'ס"מ' } },
+    { type: "type", category: "ריבוע", q: "ריבוע עם צלע <span class='highlight'>11 ס\"מ</span>. מה ההיקף?", answer: 44, hint: "11 × 4 = ?", shape: { type: "square", side: 11, unit: 'ס"מ' } },
+    // שאלות נוספות - מלבן
+    { type: "type", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>9 ס\"מ</span> ורוחב <span class='highlight'>2 ס\"מ</span>. מה ההיקף?", answer: 22, hint: "(9 + 2) × 2 = ?", shape: { type: "rectangle", width: 9, height: 2, unit: 'ס"מ' } },
+    { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>4 ס\"מ</span> ורוחב <span class='highlight'>1 ס\"מ</span>. מה ההיקף?", answer: 10, options: [10, 5, 8, 16], hint: "(4 + 1) × 2 = ?", shape: { type: "rectangle", width: 4, height: 1, unit: 'ס"מ' } },
+    { type: "type", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>12 ס\"מ</span> ורוחב <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "(12 + 3) × 2 = ?", shape: { type: "rectangle", width: 12, height: 3, unit: 'ס"מ' } },
+    { type: "mc", category: "מלבן", q: "מלבן עם אורך <span class='highlight'>9 ס\"מ</span> ורוחב <span class='highlight'>6 ס\"מ</span>. מה ההיקף?", answer: 30, options: [30, 15, 54, 24], hint: "(9 + 6) × 2 = ?", shape: { type: "rectangle", width: 9, height: 6, unit: 'ס"מ' } },
+    // שאלות נוספות - משולש
+    { type: "type", category: "משולש", q: "משולש שווה צלעות עם צלע <span class='highlight'>10 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "10 × 3 = ?", shape: { type: "triangle", sides: [10,10,10], unit: 'ס"מ' } },
+    { type: "mc", category: "משולש", q: "משולש עם צלעות <span class='highlight'>4</span>, <span class='highlight'>6</span> ו-<span class='highlight'>5</span> ס\"מ. מה ההיקף?", answer: 15, options: [15, 20, 10, 24], hint: "4 + 6 + 5 = ?", shape: { type: "triangle", sides: [4,6,5], unit: 'ס"מ' } },
+    { type: "type", category: "משולש", q: "משולש שווה צלעות עם צלע <span class='highlight'>7 ס\"מ</span>. מה ההיקף?", answer: 21, hint: "7 × 3 = ?", shape: { type: "triangle", sides: [7,7,7], unit: 'ס"מ' } },
+    // שאלות נוספות - מחומש ומשושה
+    { type: "mc", category: "מחומש", q: "מחומש (5 צלעות) משוכלל עם צלע <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 20, options: [20, 16, 24, 12], hint: "היקף מחומש משוכלל = צלע × 5", shape: null },
+    { type: "type", category: "מחומש", q: "מחומש משוכלל עם צלע <span class='highlight'>6 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "6 × 5 = ?", shape: null },
+    { type: "mc", category: "משושה", q: "משושה (6 צלעות) משוכלל עם צלע <span class='highlight'>3 ס\"מ</span>. מה ההיקף?", answer: 18, options: [18, 12, 24, 15], hint: "היקף משושה משוכלל = צלע × 6", shape: null },
+    { type: "type", category: "משושה", q: "משושה משוכלל עם צלע <span class='highlight'>5 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "5 × 6 = ?", shape: null },
+    // אתגר הפוך - מציאת צלע מהיקף (hideLabels)
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>24 ס\"מ</span>. מה אורך כל צלע?", answer: 6, options: [6, 8, 4, 12], hint: "24 ÷ 4 = ?", shape: { type: "square", side: 6, unit: 'ס"מ', hideLabels: ['side'] } },
+    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>20 ס\"מ</span> והאורך הוא <span class='highlight'>6 ס\"מ</span>. מה הרוחב?", answer: 4, hint: "20 ÷ 2 = 10, אז 10 - 6 = ?", shape: { type: "rectangle", width: 6, height: 4, unit: 'ס"מ', hideLabels: ['height'] } },
+    { type: "mc", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>15 ס\"מ</span>. מה אורך כל צלע?", answer: 5, options: [5, 3, 8, 10], hint: "15 ÷ 3 = ?", shape: { type: "triangle", sides: [5,5,5], unit: 'ס"מ', hideLabels: ['sides'] } },
+    // שאלות נוספות - בעיות מילוליות
+    { type: "mc", category: "בעיית מילים", q: "מסגרת תמונה בצורת ריבוע עם צלע <span class='highlight'>10 ס\"מ</span>. כמה ס\"מ של מסגרת צריך?", answer: 40, options: [40, 100, 20, 30], hint: "10 × 4 = ?", shape: { type: "square", side: 10, unit: 'ס"מ' } },
+    { type: "type", category: "בעיית מילים", q: "שביל משולש שווה צלעות עם צלע <span class='highlight'>12 ס\"מ</span>.<br>מה ההיקף?", answer: 36, hint: "12 × 3 = ?", shape: { type: "triangle", sides: [12,12,12], unit: 'ס"מ' } },
+    { type: "mc", category: "בעיית מילים", q: "לוח שלט בצורת מלבן: אורך <span class='highlight'>8 ס\"מ</span> ורוחב <span class='highlight'>5 ס\"מ</span>.<br>כמה ס\"מ של מסגרת צריך?", answer: 26, options: [26, 40, 13, 20], hint: "(8 + 5) × 2 = ?", shape: { type: "rectangle", width: 8, height: 5, unit: 'ס"מ' } },
+    // זיהוי צורות נוספות
+    { type: "mc", category: "זיהוי צורות", q: "לצורה יש 5 צלעות. מה שם הצורה?", answer: "מחומש", options: ["מחומש", "משושה", "ריבוע", "משולש"], hint: "5 צלעות = ?", shape: null, textAnswer: true },
+    { type: "mc", category: "זיהוי צורות", q: "לצורה יש 6 צלעות שוות. מה שם הצורה?", answer: "משושה", options: ["משושה", "מחומש", "מלבן", "משולש"], hint: "6 צלעות = ?", shape: null, textAnswer: true },
+    { type: "mc", category: "זיהוי צורות", q: "כמה צלעות יש למשולש?", answer: 3, options: [3, 4, 5, 6], hint: "משולש = מ + שלוש", shape: { type: "triangle", sides: [4,4,4], unit: 'ס"מ' } },
   ],
 
   // ----- LEVEL 3: Champion's Challenge -----
@@ -831,27 +964,73 @@ const QUESTION_BANK = {
     { type: "type", category: "היקפים", q: "מלבן עם אורך <span class='highlight'>11 ס\"מ</span> ורוחב <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 30, hint: "(11 + 4) × 2 = ?", shape: { type: "rectangle", width: 11, height: 4, unit: 'ס"מ' } },
     { type: "mc", category: "היקפים", q: "ריבוע עם צלע <span class='highlight'>12 ס\"מ</span>. מה ההיקף?", answer: 48, options: [48, 24, 36, 144], hint: "12 × 4 = ?", shape: { type: "square", side: 12, unit: 'ס"מ' } },
     { type: "type", category: "היקפים", q: "משולש עם צלעות <span class='highlight'>7</span>, <span class='highlight'>10</span> ו-<span class='highlight'>8</span> ס\"מ. מה ההיקף?", answer: 25, hint: "7 + 10 + 8 = ?", shape: { type: "triangle", sides: [10,7,8], unit: 'ס"מ' } },
-    // אתגרים הפוכים – מציאת צלע מתוך היקף
-    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>20 ס\"מ</span>. מה אורך הצלע?", answer: 5, options: [5, 4, 10, 20], hint: "היקף ÷ 4 = צלע", shape: { type: "square", side: 5, unit: 'ס"מ' } },
-    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>30 ס\"מ</span> והאורך הוא <span class='highlight'>10 ס\"מ</span>. מה הרוחב?", answer: 5, hint: "30 ÷ 2 = 15, אז 15 - 10 = ?", shape: { type: "rectangle", width: 10, height: 5, unit: 'ס"מ' } },
-    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>36 ס\"מ</span>. מה אורך הצלע?", answer: 9, options: [9, 6, 12, 8], hint: "36 ÷ 4 = ?", shape: { type: "square", side: 9, unit: 'ס"מ' } },
-    { type: "type", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>18 ס\"מ</span>. מה אורך כל צלע?", answer: 6, hint: "18 ÷ 3 = ?", shape: { type: "triangle", sides: [6,6,6], unit: 'ס"מ' } },
-    { type: "mc", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>24 ס\"מ</span> והרוחב הוא <span class='highlight'>4 ס\"מ</span>. מה האורך?", answer: 8, options: [8, 6, 10, 12], hint: "24 ÷ 2 = 12, אז 12 - 4 = ?", shape: { type: "rectangle", width: 8, height: 4, unit: 'ס"מ' } },
+    // אתגרים הפוכים – מציאת צלע מתוך היקף (hideLabels מונע חשיפת התשובה בשרטוט)
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>20 ס\"מ</span>. מה אורך הצלע?", answer: 5, options: [5, 4, 10, 20], hint: "היקף ÷ 4 = צלע", shape: { type: "square", side: 5, unit: 'ס"מ', hideLabels: ['side'] } },
+    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>30 ס\"מ</span> והאורך הוא <span class='highlight'>10 ס\"מ</span>. מה הרוחב?", answer: 5, hint: "30 ÷ 2 = 15, אז 15 - 10 = ?", shape: { type: "rectangle", width: 10, height: 5, unit: 'ס"מ', hideLabels: ['height'] } },
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>36 ס\"מ</span>. מה אורך הצלע?", answer: 9, options: [9, 6, 12, 8], hint: "36 ÷ 4 = ?", shape: { type: "square", side: 9, unit: 'ס"מ', hideLabels: ['side'] } },
+    { type: "type", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>18 ס\"מ</span>. מה אורך כל צלע?", answer: 6, hint: "18 ÷ 3 = ?", shape: { type: "triangle", sides: [6,6,6], unit: 'ס"מ', hideLabels: ['sides'] } },
+    { type: "mc", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>24 ס\"מ</span> והרוחב הוא <span class='highlight'>4 ס\"מ</span>. מה האורך?", answer: 8, options: [8, 6, 10, 12], hint: "24 ÷ 2 = 12, אז 12 - 4 = ?", shape: { type: "rectangle", width: 8, height: 4, unit: 'ס"מ', hideLabels: ['width'] } },
+    { type: "type", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>44 ס\"מ</span>. מה אורך הצלע?", answer: 11, hint: "44 ÷ 4 = ?", shape: { type: "square", side: 11, unit: 'ס"מ', hideLabels: ['side'] } },
+    { type: "mc", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>30 ס\"מ</span>. מה אורך כל צלע?", answer: 10, options: [10, 15, 6, 12], hint: "30 ÷ 3 = ?", shape: { type: "triangle", sides: [10,10,10], unit: 'ס"מ', hideLabels: ['sides'] } },
+    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>26 ס\"מ</span> והרוחב הוא <span class='highlight'>3 ס\"מ</span>. מה האורך?", answer: 10, hint: "26 ÷ 2 = 13, אז 13 - 3 = ?", shape: { type: "rectangle", width: 10, height: 3, unit: 'ס"מ', hideLabels: ['width'] } },
+    { type: "mc", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>32 ס\"מ</span>. מה אורך הצלע?", answer: 8, options: [8, 16, 4, 12], hint: "32 ÷ 4 = ?", shape: { type: "square", side: 8, unit: 'ס"מ', hideLabels: ['side'] } },
+    { type: "type", category: "אתגר", q: "היקף מלבן הוא <span class='highlight'>34 ס\"מ</span> והאורך הוא <span class='highlight'>12 ס\"מ</span>. מה הרוחב?", answer: 5, hint: "34 ÷ 2 = 17, אז 17 - 12 = ?", shape: { type: "rectangle", width: 12, height: 5, unit: 'ס"מ', hideLabels: ['height'] } },
+    { type: "mc", category: "אתגר", q: "היקף משולש שווה צלעות הוא <span class='highlight'>24 ס\"מ</span>. מה אורך כל צלע?", answer: 8, options: [8, 6, 12, 4], hint: "24 ÷ 3 = ?", shape: { type: "triangle", sides: [8,8,8], unit: 'ס"מ', hideLabels: ['sides'] } },
+    { type: "type", category: "אתגר", q: "היקף ריבוע הוא <span class='highlight'>52 ס\"מ</span>. מה אורך הצלע?", answer: 13, hint: "52 ÷ 4 = ?", shape: { type: "square", side: 13, unit: 'ס"מ', hideLabels: ['side'] } },
     // בעיות מילוליות מאתגרות
-    { type: "type", category: "בעיית מילים", q: "לנועם יש חבל באורך <span class='highlight'>2 מטר</span>. הוא רוצה לעשות ממנו ריבוע.<br>מה יהיה אורך כל צלע בסנטימטרים?", answer: 50, hint: "2 מטר = 200 ס\"מ, אז 200 ÷ 4 = ?", shape: { type: "square", side: 50, unit: 'ס"מ' } },
+    { type: "type", category: "בעיית מילים", q: "לשרן יש חבל באורך <span class='highlight'>2 מטר</span>. היא רוצה לעשות ממנו ריבוע.<br>מה יהיה אורך כל צלע בסנטימטרים?", answer: 50, hint: "2 מטר = 200 ס\"מ, אז 200 ÷ 4 = ?", shape: { type: "square", side: 50, unit: 'ס"מ', hideLabels: ['side'] } },
     { type: "mc", category: "בעיית מילים", q: "מגרש כדורגל קטן בצורת מלבן: אורך <span class='highlight'>20 מטר</span>, רוחב <span class='highlight'>10 מטר</span>.<br>מה היקף המגרש?", answer: 60, options: [60, 200, 30, 40], hint: "(20 + 10) × 2 = ?", shape: { type: "rectangle", width: 20, height: 10, unit: 'מטר' } },
     { type: "type", category: "בעיית מילים", q: "יעל רצה <span class='highlight'>3</span> פעמים סביב מגרש ריבועי עם צלע <span class='highlight'>10 מטר</span>.<br>כמה מטרים היא רצה בסך הכל?", answer: 120, hint: "היקף = 10 × 4 = 40, אז 40 × 3 = ?", shape: { type: "square", side: 10, unit: 'מטר' } },
     { type: "mc", category: "בעיית מילים", q: "המרחק מהבית לבית הספר הוא <span class='highlight'>1 ק\"מ ו-500 מטר</span>. כמה מטרים זה?", answer: 1500, options: [1500, 1050, 500, 15000], hint: "1 ק\"מ = 1000 מטר, אז 1000 + 500 = ?", shape: null },
     { type: "type", category: "בעיית מילים", q: "סרגל באורך <span class='highlight'>30 ס\"מ</span>. כמה מילימטרים זה?", answer: 300, hint: "30 × 10 = ?", shape: null },
     { type: "mc", category: "בעיית מילים", q: "שרשרת באורך <span class='highlight'>2 מטר</span>. חתכו ממנה <span class='highlight'>50 ס\"מ</span>.<br>כמה ס\"מ נשאר?", answer: 150, options: [150, 250, 50, 100], hint: "2 מטר = 200 ס\"מ, אז 200 - 50 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "חבל באורך <span class='highlight'>1 מטר</span>. שרן חותכת ממנו חתיכה של <span class='highlight'>30 ס\"מ</span>.<br>כמה ס\"מ נשארו?", answer: 70, hint: "1 מטר = 100 ס\"מ, אז 100 - 30 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "לדני יש <span class='highlight'>3</span> חוטים, כל אחד באורך <span class='highlight'>50 ס\"מ</span>. הוא מחבר אותם.<br>כמה ס\"מ של חוט יש לו?", answer: 150, options: [150, 100, 200, 53], hint: "3 × 50 = ?", shape: null },
+    { type: "type", category: "בעיית מילים", q: "יעל הלכה <span class='highlight'>2 ק\"מ</span> ועוד <span class='highlight'>500 מטר</span>.<br>כמה מטרים היא הלכה בסך הכל?", answer: 2500, hint: "2 ק\"מ = 2000 מטר, אז 2000 + 500 = ?", shape: null },
+    { type: "mc", category: "בעיית מילים", q: "לשרן יש חבל באורך <span class='highlight'>3 מטר</span>. היא רוצה לעשות ממנו משולש שווה צלעות.<br>כמה ס\"מ תהיה כל צלע?", answer: 100, options: [100, 150, 50, 300], hint: "3 מטר = 300 ס\"מ, אז 300 ÷ 3 = ?", shape: { type: "triangle", sides: [100,100,100], unit: 'ס"מ', hideLabels: ['sides'] } },
+    { type: "mc", category: "היקפים", q: "מחומש משוכלל (5 צלעות שוות) עם צלע <span class='highlight'>7 ס\"מ</span>. מה ההיקף?", answer: 35, options: [35, 28, 42, 21], hint: "7 × 5 = ?", shape: null },
+    { type: "type", category: "היקפים", q: "משושה משוכלל (6 צלעות שוות) עם צלע <span class='highlight'>8 ס\"מ</span>. מה ההיקף?", answer: 48, hint: "8 × 6 = ?", shape: null },
+    { type: "mc", category: "היקפים", q: "מחומש משוכלל עם צלע <span class='highlight'>10 ס\"מ</span>. מה ההיקף?", answer: 50, options: [50, 40, 60, 100], hint: "10 × 5 = ?", shape: null },
+    { type: "type", category: "היקפים", q: "משושה משוכלל עם צלע <span class='highlight'>4 ס\"מ</span>. מה ההיקף?", answer: 24, hint: "4 × 6 = ?", shape: null },
   ]
 };
+
+// ============================================================
+//  SUB-LEVEL DEFINITIONS
+// ============================================================
+const SUB_LEVEL_DEFS = {
+  1: [
+    { name: 'ס"מ ↔ מ"מ', emoji: '📏', categories: ['המרת יחידות'], filterFn: q => /מילימטר|מ\"מ/.test(q.q) },
+    { name: 'מטר ↔ ס"מ', emoji: '📐', categories: ['המרת יחידות'], filterFn: q => /מטר/.test(q.q) && !/מילימטר|מ\"מ|קילומטר|ק\"מ/.test(q.q) },
+    { name: 'מטר ↔ ק"מ', emoji: '🛤️', categories: ['המרת יחידות'], filterFn: q => /קילומטר|ק\"מ/.test(q.q) },
+    { name: 'בעיות מילוליות', emoji: '📝', categories: ['בעיית מילים'] },
+    { name: 'מיקס כולל', emoji: '🎲', categories: null },
+  ],
+  2: [
+    { name: 'ריבועים', emoji: '🟦', categories: ['ריבוע'] },
+    { name: 'מלבנים', emoji: '🟩', categories: ['מלבן'] },
+    { name: 'משולשים', emoji: '🔺', categories: ['משולש'] },
+    { name: 'זיהוי צורות', emoji: '🔍', categories: ['זיהוי צורות', 'מחומש', 'משושה'] },
+    { name: 'בעיות + אתגר', emoji: '🏆', categories: ['בעיית מילים', 'אתגר'] },
+    { name: 'מיקס כולל', emoji: '🎲', categories: null },
+  ],
+  3: [
+    { name: 'ק"מ ↔ מטר', emoji: '🛤️', categories: ['המרת יחידות'] },
+    { name: 'היקפים מתקדמים', emoji: '📐', categories: ['היקפים'] },
+    { name: 'אתגר הפוך', emoji: '🧩', categories: ['אתגר'] },
+    { name: 'בעיות מילוליות', emoji: '📝', categories: ['בעיית מילים'] },
+    { name: 'מיקס כולל', emoji: '🎲', categories: null },
+  ]
+};
+
+const QUESTIONS_PER_SUBLEVEL = 15;
 
 // ============================================================
 //  GAME STATE
 // ============================================================
 let state = {
   currentLevel: 1,
+  currentSubLevel: 0,
   currentQuestionIndex: 0,
   questions: [],
   score: 0,
@@ -977,23 +1156,56 @@ function goHome() {
 }
 
 // ============================================================
-//  LEVEL START
+//  SUB-LEVEL SCREEN
 // ============================================================
-function startLevel(level) {
+function showSubLevels(level) {
   playSound('click');
   state.currentLevel = level;
+  const levelIcons = { 1: '🌍', 2: '🪐', 3: '⭐' };
+  const levelNames = { 1: 'שלב 1 – המרת יחידות', 2: 'שלב 2 – צורות והיקפים', 3: 'שלב 3 – אתגר אלופים' };
+  document.getElementById('subLevelIcon').textContent = levelIcons[level];
+  document.getElementById('subLevelTitle').textContent = levelNames[level];
+
+  const grid = document.getElementById('subLevelGrid');
+  grid.innerHTML = '';
+  const subs = SUB_LEVEL_DEFS[level];
+  subs.forEach((sub, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'sublevel-btn';
+    btn.innerHTML = `<span class="sub-emoji">${sub.emoji}</span><span class="sub-name">${sub.name}</span><span class="sub-info">15 שאלות</span>`;
+    btn.addEventListener('click', () => startSubLevel(level, idx));
+    grid.appendChild(btn);
+  });
+
+  showScreen('subLevelScreen');
+}
+
+function backToSubLevels() {
+  playSound('click');
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('progressContainer').style.display = 'none';
+  showSubLevels(state.currentLevel);
+}
+
+// ============================================================
+//  LEVEL START
+// ============================================================
+function startSubLevel(level, subIdx) {
+  playSound('click');
+  state.currentLevel = level;
+  state.currentSubLevel = subIdx;
   state.currentQuestionIndex = 0;
   state.score = 0;
   state.streak = 0;
   state.maxStreak = 0;
   state.correctCount = 0;
 
-  // Copy and shuffle questions
+  // Copy all questions for this level
   const key = 'level' + level;
-  let questions = JSON.parse(JSON.stringify(QUESTION_BANK[key]));
+  let allQuestions = JSON.parse(JSON.stringify(QUESTION_BANK[key]));
 
   // For ruler questions, generate random lengths
-  questions.forEach(q => {
+  allQuestions.forEach(q => {
     if (q.type === 'ruler') {
       const len = Math.floor(Math.random() * 6) + 3; // 3-8 cm
       q.answer = len;
@@ -1001,19 +1213,37 @@ function startLevel(level) {
     }
   });
 
-  // Shuffle
-  for (let i = questions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [questions[i], questions[j]] = [questions[j], questions[i]];
+  // Filter by sub-level category
+  const subDef = SUB_LEVEL_DEFS[level][subIdx];
+  let filtered;
+  if (subDef.categories === null) {
+    // Mix mode — take all questions
+    filtered = allQuestions;
+  } else if (subDef.filterFn) {
+    // Has a custom filter function — first filter by categories then by filterFn
+    filtered = allQuestions.filter(q => subDef.categories.includes(q.category) && subDef.filterFn(q));
+  } else {
+    filtered = allQuestions.filter(q => subDef.categories.includes(q.category));
   }
 
-  state.questions = questions;
+  // Shuffle
+  for (let i = filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
+
+  // Take 15 questions (or all if fewer)
+  state.questions = filtered.slice(0, QUESTIONS_PER_SUBLEVEL);
 
   document.getElementById('statsBar').style.display = 'flex';
   document.getElementById('progressContainer').style.display = '';
   updateStats();
   showScreen('questionScreen');
   loadQuestion();
+}
+
+function startLevel(level) {
+  showSubLevels(level);
 }
 
 // ============================================================
@@ -1032,7 +1262,8 @@ function loadQuestion() {
 
   // Level indicator
   const levelNames = ['🌍 שלב 1', '🪐 שלב 2', '⭐ שלב 3'];
-  document.getElementById('levelIndicator').textContent = levelNames[state.currentLevel - 1];
+  const subName = SUB_LEVEL_DEFS[state.currentLevel][state.currentSubLevel].name;
+  document.getElementById('levelIndicator').textContent = levelNames[state.currentLevel - 1] + ' / ' + subName;
 
   // Category badge
   document.getElementById('questionTypeBadge').textContent = q.category;
@@ -1078,9 +1309,13 @@ function loadQuestion() {
 // ============================================================
 //  DRAW SHAPES (SVG)
 // ============================================================
-function drawShape(shape) {
+function drawShape(shape, reveal) {
   const display = document.getElementById('shapeDisplay');
   display.style.display = 'flex';
+
+  // hideLabels: array of label keys to hide until answer is given
+  // e.g. ['side'] for square, ['width'] or ['height'] for rectangle, ['sides'] for triangle
+  const hide = (!reveal && shape.hideLabels) ? shape.hideLabels : [];
 
   let svg = '';
   const w = 240, h = 180;
@@ -1088,38 +1323,42 @@ function drawShape(shape) {
   if (shape.type === 'square') {
     const s = 100;
     const x = (w - s) / 2, y = (h - s) / 2;
+    const sideLabel = hide.includes('side') ? '?' : `${shape.side} ${shape.unit}`;
     svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
       <rect class="shape-line" x="${x}" y="${y}" width="${s}" height="${s}" rx="4"/>
       <!-- Top label -->
       <line class="dim-line" x1="${x}" y1="${y - 12}" x2="${x + s}" y2="${y - 12}"/>
-      <text class="label-text" x="${x + s/2}" y="${y - 18}" text-anchor="middle">${shape.side} ${shape.unit}</text>
+      <text class="label-text" x="${x + s/2}" y="${y - 18}" text-anchor="middle">${sideLabel}</text>
       <!-- Right label -->
       <line class="dim-line" x1="${x + s + 12}" y1="${y}" x2="${x + s + 12}" y2="${y + s}"/>
-      <text class="label-text" x="${x + s + 28}" y="${y + s/2 + 5}" text-anchor="middle">${shape.side} ${shape.unit}</text>
+      <text class="label-text" x="${x + s + 28}" y="${y + s/2 + 5}" text-anchor="middle">${sideLabel}</text>
     </svg>`;
   } else if (shape.type === 'rectangle') {
     const rw = 140, rh = 80;
     const x = (w - rw) / 2, y = (h - rh) / 2;
+    const widthLabel = hide.includes('width') ? '?' : `${shape.width} ${shape.unit}`;
+    const heightLabel = hide.includes('height') ? '?' : `${shape.height} ${shape.unit}`;
     svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
       <rect class="shape-line" x="${x}" y="${y}" width="${rw}" height="${rh}" rx="4"/>
       <line class="dim-line" x1="${x}" y1="${y - 12}" x2="${x + rw}" y2="${y - 12}"/>
-      <text class="label-text" x="${x + rw/2}" y="${y - 18}" text-anchor="middle">${shape.width} ${shape.unit}</text>
+      <text class="label-text" x="${x + rw/2}" y="${y - 18}" text-anchor="middle">${widthLabel}</text>
       <line class="dim-line" x1="${x + rw + 12}" y1="${y}" x2="${x + rw + 12}" y2="${y + rh}"/>
-      <text class="label-text" x="${x + rw + 30}" y="${y + rh/2 + 5}" text-anchor="middle">${shape.height} ${shape.unit}</text>
+      <text class="label-text" x="${x + rw + 30}" y="${y + rh/2 + 5}" text-anchor="middle">${heightLabel}</text>
     </svg>`;
   } else if (shape.type === 'triangle') {
     const cx = w / 2, topY = 25, botY = h - 25;
     const halfBase = 70;
     const pts = `${cx},${topY} ${cx - halfBase},${botY} ${cx + halfBase},${botY}`;
     const s = shape.sides;
+    const sLabels = s.map((val, i) => hide.includes('sides') ? '?' : `${val} ${shape.unit}`);
     svg = `<svg class="shape-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
       <polygon class="shape-line" points="${pts}"/>
       <!-- Bottom label -->
-      <text class="label-text" x="${cx}" y="${botY + 18}" text-anchor="middle">${s[0]} ${shape.unit}</text>
+      <text class="label-text" x="${cx}" y="${botY + 18}" text-anchor="middle">${sLabels[0]}</text>
       <!-- Left label -->
-      <text class="label-text" x="${cx - halfBase - 16}" y="${(topY + botY)/2}" text-anchor="end">${s[1]} ${shape.unit}</text>
+      <text class="label-text" x="${cx - halfBase - 16}" y="${(topY + botY)/2}" text-anchor="end">${sLabels[1]}</text>
       <!-- Right label -->
-      <text class="label-text" x="${cx + halfBase + 16}" y="${(topY + botY)/2}" text-anchor="start">${s[2]} ${shape.unit}</text>
+      <text class="label-text" x="${cx + halfBase + 16}" y="${(topY + botY)/2}" text-anchor="start">${sLabels[2]}</text>
     </svg>`;
   }
 
@@ -1308,6 +1547,14 @@ function checkTypeAnswer() {
   }
 }
 
+// Reveal hidden labels on shape after answering
+function revealShapeLabels() {
+  const q = state.questions[state.currentQuestionIndex];
+  if (q.shape && q.shape.hideLabels && q.shape.hideLabels.length > 0) {
+    drawShape(q.shape, true);
+  }
+}
+
 function handleCorrect() {
   playSound('correct');
   const bonus = state.hintUsed ? 5 : 10;
@@ -1317,6 +1564,7 @@ function handleCorrect() {
   state.correctCount++;
   updateStats();
   launchConfetti();
+  revealShapeLabels();
 
   showFeedback(true, state.streak >= 3 ? `רצף של ${state.streak}! 🔥` : '');
 }
@@ -1325,6 +1573,7 @@ function handleWrong(q) {
   playSound('wrong');
   state.streak = 0;
   updateStats();
+  revealShapeLabels();
 
   const correctAnswer = q.answer;
   showFeedback(false, `התשובה הנכונה: ${correctAnswer}`);
@@ -1421,7 +1670,7 @@ function endLevel() {
 
 function restartLevel() {
   playSound('click');
-  startLevel(state.currentLevel);
+  startSubLevel(state.currentLevel, state.currentSubLevel);
 }
 
 // ============================================================
@@ -1442,7 +1691,9 @@ function showHint() {
 function updateStats() {
   document.getElementById('scoreDisplay').textContent = state.score;
   document.getElementById('streakDisplay').textContent = state.streak;
-  document.getElementById('levelDisplay').textContent = state.currentLevel;
+  const subName = SUB_LEVEL_DEFS[state.currentLevel] && SUB_LEVEL_DEFS[state.currentLevel][state.currentSubLevel]
+    ? SUB_LEVEL_DEFS[state.currentLevel][state.currentSubLevel].name : state.currentLevel;
+  document.getElementById('levelDisplay').textContent = subName;
 }
 
 // ============================================================
